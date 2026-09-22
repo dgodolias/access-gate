@@ -1,0 +1,75 @@
+{
+  "name": "@dgodolias/access-gate",
+  "version": "0.1.0",
+  "description": "Plug-and-play shared-password gate that locks an entire web app (pages, API, static assets) behind one login page, toggled by a single environment variable.",
+  "license": "MIT",
+  "author": "Dimosthenis Gkontolias",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dgodolias/access-gate.git"
+  },
+  "homepage": "https://github.com/dgodolias/access-gate#readme",
+  "bugs": {
+    "url": "https://github.com/dgodolias/access-gate/issues"
+  },
+  "keywords": ["password", "gate", "middleware", "proxy", "nextjs", "vercel", "edge", "auth", "staging", "preview"],
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "sideEffects": false,
+  "files": ["dist", "README.md", "CHANGELOG.md", "LICENSE", "SECURITY.md"],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
+      "require": { "types": "./dist/index.d.cts", "default": "./dist/index.cjs" }
+    },
+    "./core": {
+      "import": { "types": "./dist/core.d.ts", "default": "./dist/core.js" },
+      "require": { "types": "./dist/core.d.cts", "default": "./dist/core.cjs" }
+    },
+    "./next": {
+      "import": { "types": "./dist/next.d.ts", "default": "./dist/next.js" },
+      "require": { "types": "./dist/next.d.cts", "default": "./dist/next.cjs" }
+    },
+    "./vercel": {
+      "import": { "types": "./dist/vercel.d.ts", "default": "./dist/vercel.js" },
+      "require": { "types": "./dist/vercel.d.cts", "default": "./dist/vercel.cjs" }
+    },
+    "./presets": {
+      "import": { "types": "./dist/presets.d.ts", "default": "./dist/presets.js" },
+      "require": { "types": "./dist/presets.d.cts", "default": "./dist/presets.cjs" }
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "npm run build && vitest run",
+    "test:watch": "vitest",
+    "smoke": "node scripts/smoke.mjs",
+    "smoke:next16": "node scripts/smoke.mjs next16",
+    "smoke:next15": "node scripts/smoke.mjs next15-middleware",
+    "smoke:vercel": "node scripts/smoke.mjs vercel-static",
+    "prepack": "npm run build"
+  },
+  "peerDependencies": {
+    "@vercel/functions": ">=1.0.0",
+    "next": ">=13.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@vercel/functions": { "optional": true },
+    "next": { "optional": true }
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@vercel/functions": "^3.9.9",
+    "next": "^16.3.5",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.11"
+  }
+}
