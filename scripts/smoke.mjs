@@ -225,6 +225,29 @@ async function gateOnScenario() {
   check("cross-origin POST is 403", crossOrigin.status === 403, `status ${crossOrigin.status}`);
   const openRedirect = await login({ password: PASSWORD, next: "https://evil.test/" }, { "x-forwarded-for": "smoke-client-d" });
   check("external next is collapsed to /", openRedirect.status === 303 && locationIs(openRedirect, "/"), `location ${openRedirect.headers.location}`);
+
+  // Behind a TLS-terminating proxy (Vercel) the request carries x-forwarded-proto: https → __Host- + Secure cookie.
+  const https = await login(
+    { password: PASSWORD, next: "/" },
+    { "x-forwarded-for": "smoke-client-e", "x-forwarded-proto": "https", "x-forwarded-host": `localhost:${PORT}`, origin: `https://localhost:${PORT}` },
+  );
+  check("https (x-forwarded-proto) cookie: __Host- prefix + Secure", https.status === 303 && /^__Host-access_gate_session=v1\./.test(https.setCookie) && /Secure/.test(https.setCookie), `status ${https.status} ${https.setCookie}`);
+
+  return cookie;
+}
+
+async function rotationScenario(oldCookie) {
+  const kept = await navigate("/", { cookie: oldCookie });
+  check("rotated password + ACCESS_GATE_PREVIOUS_PASSWORD keeps the old session", kept.status === 200, `status ${kept.status}`);
+  const oldLogin = await login({ password: PASSWORD, next: "/" }, { "x-forwarded-for": "smoke-client-f" });
+  check("old password no longer logs in", oldLogin.status === 401, `status ${oldLogin.status}`);
+  const newLogin = await login({ password: `${PASSWORD}-rotated`, next: "/" }, { "x-forwarded-for": "smoke-client-f" });
+  check("new password logs in", newLogin.status === 303, `status ${newLogin.status}`);
+}
+
+async function rotatedOnlyScenario(oldCookie) {
+  const dropped = await navigate("/", { cookie: oldCookie });
+  check("changing the password without PREVIOUS invalidates old sessions", dropped.status === 401, `status ${dropped.status}`);
 }
 
 async function gateOffScenario() {
@@ -241,9 +264,22 @@ try {
   await ensureBuilt();
 
   console.log(`\n> ${example}: gate ON (${BASE})`);
-  child = start({ ACCESS_GATE_PASSWORD: PASSWORD, ACCESS_GATE_EXEMPT: "/api/health,/api/cron/*", ...(isNext ? {} : { ACCESS_GATE_ALWAYS: "1" }) });
+  const always = isNext ? {} : { ACCESS_GATE_ALWAYS: "1" };
+  child = start({ ACCESS_GATE_PASSWORD: PASSWORD, ACCESS_GATE_EXEMPT: "/api/health,/api/cron/*", ...always });
   await waitReady();
-  await gateOnScenario();
+  const cookie = await gateOnScenario();
+  await stop(child);
+
+  console.log(`\n> ${example}: rotated password with ACCESS_GATE_PREVIOUS_PASSWORD (${BASE})`);
+  child = start({ ACCESS_GATE_PASSWORD: `${PASSWORD}-rotated`, ACCESS_GATE_PREVIOUS_PASSWORD: PASSWORD, ...always });
+  await waitReady();
+  await rotationScenario(cookie);
+  await stop(child);
+
+  console.log(`\n> ${example}: rotated password only (${BASE})`);
+  child = start({ ACCESS_GATE_PASSWORD: `${PASSWORD}-rotated`, ...always });
+  await waitReady();
+  await rotatedOnlyScenario(cookie);
   await stop(child);
 
   console.log(`\n> ${example}: gate OFF (${BASE})`);
