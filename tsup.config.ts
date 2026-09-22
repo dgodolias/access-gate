@@ -16,5 +16,5 @@ export default defineConfig({
   treeshake: true,
   target: "es2022",
   platform: "neutral",
-  external: ["next", "next/server", "@vercel/functions", "@vercel/functions/middleware"],
+  external: ["@vercel/functions", "@vercel/functions/middleware"],
 });

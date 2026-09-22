@@ -1,0 +1,13 @@
+{
+  "name": "example-vercel-static",
+  "private": true,
+  "type": "module",
+  "description": "Plain Vercel project (static site + functions) gated by @dgodolias/access-gate via proxy.ts",
+  "scripts": {
+    "start": "node serve.mjs"
+  },
+  "dependencies": {
+    "@dgodolias/access-gate": "file:../..",
+    "@vercel/functions": "^3.9.9"
+  }
+}

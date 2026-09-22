@@ -1,0 +1,22 @@
+{
+  "name": "example-next15-middleware",
+  "private": true,
+  "description": "Next.js 15 App Router example gated by @dgodolias/access-gate via src/middleware.ts (Edge runtime)",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@dgodolias/access-gate": "file:../..",
+    "next": "15.5.25",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "typescript": "^5.9.3"
+  }
+}
