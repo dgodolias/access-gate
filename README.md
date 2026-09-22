@@ -11,7 +11,7 @@ runtime and the Edge runtime.
 ## Quick start (Next.js)
 
 ```bash
-npm i github:dgodolias/access-gate
+npm i @dgodolias/access-gate        # or straight from GitHub: npm i github:dgodolias/access-gate
 ```
 
 ```ts
@@ -27,9 +27,8 @@ That is all. No config file, no provider, no layout change, no page to create.
 The login page is served straight from the proxy with inline CSS, so nothing of
 your app loads until the password is right.
 
-> The package is not on npm yet, hence the GitHub install line. The package name
-> is `@dgodolias/access-gate` because the bare `access-gate` name was already
-> taken on npm.
+> The package is scoped (`@dgodolias/access-gate`) because the bare
+> `access-gate` name was already taken on npm.
 
 ## Per framework
 
@@ -84,7 +83,8 @@ export { default } from "@dgodolias/access-gate/vercel";
 
 This entry uses `next()` from `@vercel/functions`, which is an optional peer
 dependency: `npm i @vercel/functions`. `createProxy(options)` is available here
-as well.
+as well. From CommonJS use `require("@dgodolias/access-gate/vercel").proxy`
+(the default export lives under `.default`).
 
 ### Anything else (`Request`/`Response` runtimes)
 

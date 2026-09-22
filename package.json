@@ -118,5 +118,24 @@
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",
     "vitest": "^4.1.11"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "typesVersions": {
+    "*": {
+      "core": [
+        "./dist/core.d.ts"
+      ],
+      "next": [
+        "./dist/next.d.ts"
+      ],
+      "vercel": [
+        "./dist/vercel.d.ts"
+      ],
+      "presets": [
+        "./dist/presets.d.ts"
+      ]
+    }
   }
 }
