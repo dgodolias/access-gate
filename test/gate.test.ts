@@ -34,6 +34,22 @@ describe("environments", () => {
     expect(alwaysOption.status).toBe(401);
   });
 
+  test("ACCESS_GATE_ENABLED=false (or enabled: false) is a master off switch even with a password", async () => {
+    for (const value of ["false", "0", "off", "no", " FALSE "]) {
+      const res = await invoke(navigate("/"), { ...PROD_ENV, ACCESS_GATE_ENABLED: value });
+      expect(res.headers.get("x-test-next"), value).toBe("1");
+      expect((await invoke(request("/_access"), { ...PROD_ENV, ACCESS_GATE_ENABLED: value })).headers.get("x-test-next")).toBe("1");
+    }
+    for (const value of ["true", "1", "", "yes"]) {
+      expect((await invoke(navigate("/"), { ...PROD_ENV, ACCESS_GATE_ENABLED: value })).status, value).toBe(401);
+    }
+    expect((await invoke(navigate("/"), PROD_ENV, NOW, undefined, { enabled: false })).headers.get("x-test-next")).toBe("1");
+    expect((await invoke(navigate("/"), { ...PROD_ENV, ACCESS_GATE_ENABLED: "false" }, NOW, undefined, { enabled: true })).status).toBe(401);
+    // Off beats fail-closed and always.
+    expect((await invoke(navigate("/"), { VERCEL_ENV: "production", ACCESS_GATE_REQUIRED: "1", ACCESS_GATE_ENABLED: "false", ACCESS_GATE_ALWAYS: "1" })).headers.get("x-test-next")).toBe("1");
+    expect(gateWith({}, { ...PROD_ENV, ACCESS_GATE_ENABLED: "false" }).describe().active).toBe(false);
+  });
+
   test("unset or empty password turns the gate off with zero effect", async () => {
     for (const env of [{ VERCEL_ENV: "production" }, { VERCEL_ENV: "production", ACCESS_GATE_PASSWORD: "" }]) {
       const res = await invoke(navigate("/"), env);

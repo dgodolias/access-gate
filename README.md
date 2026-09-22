@@ -117,6 +117,7 @@ variable > default**. Environment variables are read from `process.env` (or the
 | `previousPassword` | `ACCESS_GATE_PREVIOUS_PASSWORD` | – | Sessions signed by this older password stay valid during a rotation. Only the current password logs in. |
 | `secret` | `ACCESS_GATE_SECRET` | – | Sign sessions with an independent secret instead of the password. Changing the password then does **not** log everyone out. |
 | `environments` | `ACCESS_GATE_ENVIRONMENTS` | `production,preview` | Environments in which the gate is active. The environment is `VERCEL_ENV`, falling back to `production` when `NODE_ENV=production` and `development` otherwise. So `next dev` is open, `next start` and Vercel production/preview are gated. |
+| `enabled` | `ACCESS_GATE_ENABLED` | `true` | Master switch. `false`/`0`/`off`/`no` turns the gate off everywhere, even with a password set (handy to open the site without deleting the secret). |
 | `always` | `ACCESS_GATE_ALWAYS=1` | `false` | Gate regardless of environment (non-Vercel hosts, custom servers). |
 | `failClosed` | `ACCESS_GATE_REQUIRED=1` | `false` | Respond 503 "not configured" instead of passing through when the gate is active but no password is set. The env var only applies in `production`; the option applies wherever the gate is active. |
 | `accessPath` | `ACCESS_GATE_PATH` | `/_access` | Login route (GET renders, POST verifies, `?logout=1` signs out). |

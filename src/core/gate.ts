@@ -49,6 +49,12 @@ function truthy(value: string | undefined): boolean {
   return value !== undefined && TRUTHY.has(value.trim().toLowerCase());
 }
 
+const FALSY = new Set(["0", "false", "no", "off"]);
+
+function falsy(value: string | undefined): boolean {
+  return value !== undefined && FALSY.has(value.trim().toLowerCase());
+}
+
 function processEnv(): EnvironmentSource {
   const maybeProcess = (globalThis as { process?: { env?: EnvironmentSource } }).process;
   return maybeProcess && maybeProcess.env ? maybeProcess.env : {};
@@ -118,7 +124,9 @@ export function createGate(options: GateOptions = {}): Gate {
     const environment = env.VERCEL_ENV || (env.NODE_ENV === "production" ? "production" : "development");
     const environments = options.environments ?? (env.ACCESS_GATE_ENVIRONMENTS !== undefined ? parseList(env.ACCESS_GATE_ENVIRONMENTS) : DEFAULT_ENVIRONMENTS);
     const always = options.always ?? truthy(env.ACCESS_GATE_ALWAYS);
-    const active = always || environments.includes(environment);
+    // Master switch: enabled=false (or ACCESS_GATE_ENABLED=false/0/off/no) turns the gate off even with a password set.
+    const enabled = options.enabled ?? !falsy(env.ACCESS_GATE_ENABLED);
+    const active = enabled && (always || environments.includes(environment));
 
     const password = options.password ?? env.ACCESS_GATE_PASSWORD ?? "";
     const previousPassword = options.previousPassword ?? env.ACCESS_GATE_PREVIOUS_PASSWORD ?? "";

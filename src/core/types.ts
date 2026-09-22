@@ -131,6 +131,8 @@ export interface GateOptions {
   isApi?: ((url: URL, request: Request) => boolean) | undefined;
   /** Environments (VERCEL_ENV, falling back to NODE_ENV) in which the gate is active. Env: ACCESS_GATE_ENVIRONMENTS. Default ["production", "preview"]. */
   environments?: readonly string[] | undefined;
+  /** Master switch. `false` turns the gate off even when a password is set. Env: ACCESS_GATE_ENABLED=false. Default true. */
+  enabled?: boolean | undefined;
   /** Gate regardless of environment. Env: ACCESS_GATE_ALWAYS=1. */
   always?: boolean | undefined;
   /** Respond 503 instead of passing through when no password is configured. Env: ACCESS_GATE_REQUIRED=1 (production only). */
